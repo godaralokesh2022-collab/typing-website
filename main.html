@@ -1,1 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeRacer Pro - AI Typing Competition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4ade80;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray: #6c757d;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .logo i {
+            color: var(--accent);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        nav a:hover, nav a.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            padding: 2rem 0;
+            flex: 1;
+        }
+
+        /* Competition Area */
+        .competition-area {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+        }
+
+        .section-title i {
+            font-size: 1.8rem;
+        }
+
+        /* Text Display */
+        .text-display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            min-height: 150px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .text-to-type {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .current-word {
+            background: var(--primary);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .typed-correct {
+            color: var(--success);
+        }
+
+        .typed-incorrect {
+            color: var(--danger);
+            text-decoration: underline;
+        }
+
+        /* Input Area */
+        .input-area {
+            margin-bottom: 1.5rem;
+        }
+
+        #typing-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1.2rem;
+            transition: border 0.3s;
+        }
+
+        #typing-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Stats Area */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .wpm {
+            color: var(--accent);
+        }
+
+        .accuracy {
+            color: var(--success);
+        }
+
+        .timer {
+            color: var(--warning);
+        }
+
+        .errors {
+            color: var(--danger);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Competitors */
+        .competitors {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .competitor {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .user-avatar {
+            background: var(--primary);
+        }
+
+        .ai-avatar {
+            background: var(--danger);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .user-progress {
+            background: var(--primary);
+        }
+
+        .ai-progress {
+            background: var(--danger);
+        }
+
+        .competitor-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Ad Section */
+        .ad-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .ad-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .ad-content {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+        }
+
+        .ad-content i {
+            font-size: 3rem;
+            color: var(--accent);
+        }
+
+        .ad-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .ad-cta {
+            background: var(--warning);
+            color: var(--dark);
+            padding: 0.7rem 1.5rem;
+            border-radius: 5px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .ad-cta:hover {
+            background: #e69500;
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                order: -1;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .competitors {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-keyboard"></i>
+                    <span>TypeRacer Pro</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="active">Home</a></li>
+                        <li><a href="#">Competitions</a></li>
+                        <li><a href="#">Practice</a></li>
+                        <li><a href="#">Profile</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-content">
+            <!-- Competition Area -->
+            <div class="competition-area">
+                <h2 class="section-title"><i class="fas fa-flag-checkered"></i> Typing Competition</h2>
+                
+                <!-- Text Display -->
+                <div class="text-display">
+                    <span class="text-to-type">
+                        <span class="typed-correct">The quick brown fox jumps over the lazy dog. This classic sentence contains every letter in the English alphabet. Typing competitions help improve your speed and accuracy. </span>
+                        <span class="current-word">Practice</span>
+                        <span> regularly to become a typing master. Challenge yourself with different texts and difficulty levels. Remember, accuracy is just as important as speed when it comes to efficient typing.</span>
+                    </span>
+                </div>
+                
+                <!-- Input Area -->
+                <div class="input-area">
+                    <input type="text" id="typing-input" placeholder="Start typing here...">
+                </div>
+                
+                <!-- Stats -->
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value wpm">42</div>
+                        <div class="stat-label">Words Per Minute</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value accuracy">96%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value timer">60s</div>
+                        <div class="stat-label">Time Remaining</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value errors">2</div>
+                        <div class="stat-label">Errors</div>
+                    </div>
+                </div>
+                
+                <!-- Competitors -->
+                <div class="competitors">
+                    <div class="competitor">
+                        <div class="avatar user-avatar">YP</div>
+                        <div class="competitor-name">You</div>
+                        <div class="progress-bar">
+                            <div class="progress user-progress" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    <div class="competitor">
+                        <div class="avatar ai-avatar">AI</div>
+                        <div class="competitor-name">AI Opponent</div>
+                        <div class="progress-bar">
+                            <div class="progress ai-progress" style="width: 78%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Controls -->
+                <div class="controls">
+                    <button class="btn btn-primary"><i class="fas fa-play"></i> Start Race</button>
+                    <button class="btn btn-outline"><i class="fas fa-redo"></i> Restart</button>
+                    <button class="btn btn-outline"><i class="fas fa-cog"></i> Settings</button>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Ad Section -->
+                <div class="ad-section">
+                    <h3 class="ad-title">Sponsored</h3>
+                    <div class="ad-content">
+                        <i class="fas fa-laptop-code"></i>
+                        <div class="ad-text">Upgrade to Mechanical Keyboard Pro</div>
+                        <p>Improve your typing speed with our premium mechanical keyboards</p>
+                        <a href="#" class="ad-cta">Shop Now</a>
+                    </div>
+                </div>
+                
+                <!-- Ad Section 2 -->
+                <div class="ad-section">
+                    <h3 class="ad-title">Special Offer</h3>
+                    <div class="ad-content">
+                        <i class="fas fa-graduation-cap"></i>
+                        <div class="ad-text">Typing Master Course</div>
+                        <p>Learn touch typing and increase your speed by 50% in just 2 weeks</p>
+                        <a href="#" class="ad-cta">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="copyright">
+                    &copy; 2023 TypeRacer Pro. All rights reserved.
+                </div>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sample text for typing
+        const sampleText = "The quick brown fox jumps over the lazy dog. This classic sentence contains every letter in the English alphabet. Typing competitions help improve your speed and accuracy. Practice regularly to become a typing master. Challenge yourself with different texts and difficulty levels. Remember, accuracy is just as important as speed when it comes to efficient typing.";
+        
+        // DOM Elements
+        const typingInput = document.getElementById('typing-input');
+        const wpmElement = document.querySelector('.wpm');
+        const accuracyElement = document.querySelector('.accuracy');
+        const timerElement = document.querySelector('.timer');
+        const errorsElement = document.querySelector('.errors');
+        const userProgress = document.querySelector('.user-progress');
+        const aiProgress = document.querySelector('.ai-progress');
+        
+        // Game state
+        let gameStarted = false;
+        let startTime;
+        let timerInterval;
+        let timeRemaining = 60;
+        let correctChars = 0;
+        let totalChars = 0;
+        let errors = 0;
+        
+        // Initialize the game
+        function initGame() {
+            typingInput.value = '';
+            timeRemaining = 60;
+            correctChars = 0;
+            totalChars = 0;
+            errors = 0;
+            updateStats();
+            userProgress.style.width = '0%';
+            aiProgress.style.width = '0%';
+            timerElement.textContent = `${timeRemaining}s`;
+        }
+        
+        // Start the game
+        function startGame() {
+            if (gameStarted) return;
+            
+            gameStarted = true;
+            startTime = new Date();
+            
+            // Start timer
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                timerElement.textContent = `${timeRemaining}s`;
+                
+                // Update AI progress (simulated)
+                const aiProgressValue = Math.min(100, 78 + (60 - timeRemaining) * 0.5);
+                aiProgress.style.width = `${aiProgressValue}%`;
+                
+                if (timeRemaining <= 0) {
+                    endGame();
+                }
+            }, 1000);
+            
+            // Focus on input
+            typingInput.focus();
+        }
+        
+        // End the game
+        function endGame() {
+            gameStarted = false;
+            clearInterval(timerInterval);
+            typingInput.disabled = true;
+            
+            // Calculate final WPM
+            const timeInMinutes = (60 - timeRemaining) / 60;
+            const wpm = Math.round((correctChars / 5) / timeInMinutes);
+            wpmElement.textContent = wpm;
+            
+            // Show results
+            alert(`Game Over!\nYour WPM: ${wpm}\nAccuracy: ${accuracyElement.textContent}\nErrors: ${errors}`);
+        }
+        
+        // Update statistics
+        function updateStats() {
+            // Calculate WPM
+            const timeInMinutes = (60 - timeRemaining) / 60;
+            const wpm = timeInMinutes > 0 ? Math.round((correctChars / 5) / timeInMinutes) : 0;
+            wpmElement.textContent = wpm;
+            
+            // Calculate accuracy
+            const accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+            accuracyElement.textContent = `${accuracy}%`;
+            
+            // Update errors
+            errorsElement.textContent = errors;
+            
+            // Update user progress
+            const progress = Math.min(100, (correctChars / sampleText.length) * 100);
+            userProgress.style.width = `${progress}%`;
+        }
+        
+        // Handle typing input
+        typingInput.addEventListener('input', function() {
+            if (!gameStarted) {
+                startGame();
+            }
+            
+            const typedText = this.value;
+            totalChars = typedText.length;
+            
+            // Count correct characters
+            correctChars = 0;
+            for (let i = 0; i < typedText.length; i++) {
+                if (typedText[i] === sampleText[i]) {
+                    correctChars++;
+                }
+            }
+            
+            // Count errors
+            errors = typedText.length - correctChars;
+            
+            updateStats();
+        });
+        
+        // Start button functionality
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            if (!gameStarted) {
+                initGame();
+                startGame();
+            }
+        });
+        
+        // Restart button functionality
+        document.querySelectorAll('.btn-outline')[0].addEventListener('click', function() {
+            initGame();
+            if (gameStarted) {
+                clearInterval(timerInterval);
+                gameStarted = false;
+            }
+            typingInput.disabled = false;
+            typingInput.focus();
+        });
+        
+        // Initialize the game
+        initGame();
+    </script>
+</body>
+</html>
